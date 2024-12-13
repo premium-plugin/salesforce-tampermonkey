@@ -29,6 +29,8 @@
         const bannerMessage = isProd ? 'Production Environment' : 'Sandbox Environment';
 
         // Warnleiste hinzufügen
+        const snowflakeLeft = "❄"; // Symbol links
+        const snowflakeRight = "❄"; // Symbol rechts
         $('body').prepend(`
             <div id="env-warning-banner" style="
                 position: fixed;
@@ -41,8 +43,8 @@
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             "></div>
         `);
-
-        // Konsolen-Log
+        $('.forceSearchAssistant').prepend('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeLeft + ' </span>');
+        $('.forceSearchAssistant').append('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeRight + ' </span>');
         console.log(bannerMessage);
 
         // Platz für die fixe Leiste schaffen
