@@ -2,7 +2,7 @@
 // @name         Salesforce Prod/Sandbox Banner
 // @namespace    https://example.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      1.1
+// @version      1.2
 // @description  Zeigt ein Banner an, um zwischen Produktions- und Sandbox-Umgebungen zu unterscheiden.
 // @author       AAV
 // @match        *://*.lightning.force.com/*
@@ -45,6 +45,8 @@
         `);
         $('.forceSearchAssistant').prepend('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeLeft + ' </span>');
         $('.forceSearchAssistant').append('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeRight + ' </span>');
+        $('.forceSearchInputDesktop').prepend('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeLeft + ' </span>');
+        $('.forceSearchInputDesktop').append('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeRight + ' </span>');
         console.log(bannerMessage);
 
         // Platz für die fixe Leiste schaffen
