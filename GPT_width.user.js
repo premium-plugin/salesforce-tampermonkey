@@ -4,7 +4,7 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @version      2024-12-12
 // @description  Adjust GPT chat layout width
-// @author       You
+// @author       AAV
 // @match        *://chat.openai.com/*
 // @match        *://chatgpt.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
