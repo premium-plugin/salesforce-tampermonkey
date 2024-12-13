@@ -4,7 +4,7 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @version      1.1
 // @description  Zeigt ein Banner an, um zwischen Produktions- und Sandbox-Umgebungen zu unterscheiden.
-// @author       AndreA
+// @author       AAV
 // @match        *://*.lightning.force.com/*
 // @match        *://*.salesforce-setup.com/*
 // @match        *://*.salesforce-experience.com/*
