@@ -2,7 +2,7 @@
 // @name         GPT width
 // @namespace    http://tampermonkey.net/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      2024-12-12
+// @version      0.9
 // @description  Adjust GPT chat layout width
 // @author       AAV
 // @match        *://chat.openai.com/*
