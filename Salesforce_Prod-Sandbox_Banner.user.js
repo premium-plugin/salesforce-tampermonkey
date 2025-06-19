@@ -26,6 +26,7 @@
 
         // Farbe und Text je nach Umgebung
         const bannerColor = isProd ? 'red' : 'blue';
+        const backgroundColor = isProd ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255,0.5)';
         const bannerMessage = isProd ? 'Production Environment' : 'Sandbox Environment';
 
         // Warnleiste hinzufügen
@@ -55,7 +56,7 @@
         if (!document.getElementById('env-style')) {
             $('head').append(`
                 <style id="env-style">
-                    .navBar-container { background-color: ${bannerColor} !important; }
+                    .slds-global-header { background-color: ${backgroundColor} !important; }
                 </style>
             `);
         }
