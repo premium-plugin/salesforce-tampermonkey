@@ -2,7 +2,7 @@
 // @name         Salesforce Prod/Sandbox Banner
 // @namespace    https://example.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      1.3
+// @version      1.4
 // @description  Zeigt ein Banner an, um zwischen Produktions- und Sandbox-Umgebungen zu unterscheiden.
 // @author       AAV
 // @match        *://*.lightning.force.com/*
