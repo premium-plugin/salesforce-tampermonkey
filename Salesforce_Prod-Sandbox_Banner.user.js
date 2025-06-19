@@ -38,7 +38,7 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 2px;
+                height: 4px;
                 background-color: ${bannerColor};
                 z-index: 9999;
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -56,7 +56,7 @@
         if (!document.getElementById('env-style')) {
             $('head').append(`
                 <style id="env-style">
-                    .slds-global-header { background-color: ${backgroundColor} !important; }
+                    .slds-global-header {  }
                 </style>
             `);
         }
