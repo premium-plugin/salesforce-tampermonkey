@@ -51,6 +51,14 @@
 
         // Platz für die fixe Leiste schaffen
         $('body').css('margin-top', '5px');
+        
+        if (!document.getElementById('env-style')) {
+            $('head').append(`
+                <style id="env-style">
+                    .navBar-container { background-color: ${bannerColor} !important; }
+                </style>
+            `);
+        }
     }
 
     // Skript erst nach vollständigem Seitenaufbau ausführen
