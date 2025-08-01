@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Make SF Role clean (without actions)
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Make SF Role clean (without actions)
 // @author       AAV
 // @match        *://*.my.salesforce-setup.com/lightning/setup/Roles*
