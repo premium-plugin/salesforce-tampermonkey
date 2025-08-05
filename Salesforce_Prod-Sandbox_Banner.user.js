@@ -1,72 +1,112 @@
 // ==UserScript==
-// @name         Salesforce Prod/Sandbox Banner
+// @name         Salesforce Prod/Sandbox Banner + Favicon (jQuery)
 // @namespace    https://example.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      1.4
-// @description  Zeigt ein Banner an, um zwischen Produktions- und Sandbox-Umgebungen zu unterscheiden.
-// @author       AAV
+// @version      1.0
+// @description  Banner + Favicon (3 Buchstaben aus MyDomain) farbig nach Umgebung (PROD=Rot, Sandbox=Blau)
 // @match        *://*.lightning.force.com/*
+// @match        *://*.my.salesforce.com/*
 // @match        *://*.salesforce-setup.com/*
 // @match        *://*.salesforce-experience.com/*
-// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAVFBMVEX////7//+a1fE+s+chrOVkvurW7vqV1PKp3PTu+f1zw+wAneEAn+EAoeIAouLB5ff0/P7N6/kapuN8x+0AnuFEtei64vZVuenn9vwbq+WAyu5eveqtqun9AAAAi0lEQVR4AdXQBQ7EIBRFUazG41P3/a9zfNB0Ab0JsYOze8b5NQmpipKVVd3kqGHIkAZgW950kfWw7+g9BknDGHI1WReRJUjusYaNg/AopgRpdrbAJhnlcDUZaocqRULpcEQkE4aFubYdhr5AhFXE39SJY6e37WrQHctaJvOq76JFrvaURcku4+zWPQF2BwuNVVQY9AAAAABJRU5ErkJggg==
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFmAKv1b7d+QAAAABJRU5ErkJggg==
+// @run-at       document-end
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    console.log('Script start "Salesforce Prod/Sandbox"');
+(function () {
+  'use strict';
+  if (window !== window.top) return; // nur Top-Tab
 
-    // Konfliktfreie jQuery-Instanz
-    const $ = jQuery.noConflict(true);
+  // konfliktfreie jQuery-Instanz
+  const $ = jQuery.noConflict(true);
 
-    // Banner hinzufügen
-    function addEnvBanner() {
-        const hostname = window.location.hostname;
-        const isProd = !hostname.includes('--sandbox') && !hostname.includes('sandbox');
-        console.log('Environment is Production:', isProd);
+  // --------- Helpers ----------
+  function detectEnv(host) {
+    // Sandbox in Lightning/MyDomain-Hosts hat ".sandbox."
+    return host.includes('.sandbox.') ? 'sandbox' : 'prod';
+  }
 
-        // Farbe und Text je nach Umgebung
-        const bannerColor = isProd ? 'red' : 'blue';
-        const backgroundColor = isProd ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255,0.5)';
-        const bannerMessage = isProd ? 'Production Environment' : 'Sandbox Environment';
+  function extractLabel(host) {
+    // z.B. mycom.lightning.force.com  |  agn--fullcopy.sandbox.lightning.force.com
+    const first = host.split('.')[0];           // "mycom" | "agn--fullcopy"
+    const base  = (first.split('--')[0] || ''); // "mycom" | "agn"
+    const clean = base.replace(/[^a-z0-9]/gi, '');
+    return (clean.slice(0, 3) || '·').toLowerCase(); // "myc" | "agn"
+  }
 
-        // Warnleiste hinzufügen
-        const snowflakeLeft = "❄"; // Symbol links
-        const snowflakeRight = "❄"; // Symbol rechts
-        $('body').prepend(`
-            <div id="env-warning-banner" style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 4px;
-                background-color: ${bannerColor};
-                z-index: 9999;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            "></div>
-        `);
-        $('.forceSearchAssistant').prepend('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeLeft + ' </span>');
-        $('.forceSearchAssistant').append('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeRight + ' </span>');
-        $('.forceSearchInputDesktop').prepend('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeLeft + ' </span>');
-        $('.forceSearchInputDesktop').append('<span style="color: ' + bannerColor + '; font-size: 18px; z-index: 10000;"> ' + snowflakeRight + ' </span>');
-        console.log(bannerMessage);
+  function pngDataUrl(text, bg, fg) {
+    const size = 64;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = fg;
+    const fontSize = text.length <= 2 ? 40 : 32;
+    ctx.font = '700 ' + fontSize + 'px system-ui, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, size/2, size/2 + 2);
+    return c.toDataURL('image/png');
+  }
 
-        // Platz für die fixe Leiste schaffen
-        $('body').css('margin-top', '5px');
-        
-        if (!document.getElementById('env-style')) {
-            $('head').append(`
-                <style id="env-style">
-                    .slds-global-header {  }
-                </style>
-            `);
-        }
-    }
+  function setFavicon(href) {
+    $('link[rel*="icon"]').remove(); // entfernt auch "shortcut icon"
+    // beide rel-Varianten setzen
+    $('<link>', { id: 'tm-favicon', rel: 'icon', href: href + '#tm=' + Date.now(), sizes: '16x16 32x32 64x64' }).appendTo('head');
+    $('<link>', { id: 'tm-favicon', rel: 'shortcut icon', href: href + '#tm=' + Date.now(), sizes: '16x16 32x32 64x64' }).appendTo('head');
+  }
 
-    // Skript erst nach vollständigem Seitenaufbau ausführen
-    window.addEventListener('load', () => {
-        console.log('Page fully loaded. Executing script...');
-        addEnvBanner();
-    });
+  function addEnvBanner(env, color) {
+    if ($('#env-warning-banner').length) return;
+    $('body').prepend(
+      '<div id="env-warning-banner" style="position:fixed;top:0;left:0;width:100%;height:4px;background:'+color+';z-index:9999;"></div>'
+    );
+    // kleinen Margin, damit nix überlappt
+    const mt = parseInt($('body').css('margin-top') || 0, 10);
+    if (mt < 5) $('body').css('margin-top', (mt + 5) + 'px');
+    console.log('[sf-fav] banner', env);
+  }
 
-    console.log('Script end "Salesforce Prod/Sandbox"');
+  function applyAll() {
+    const host = location.hostname;
+    const env  = detectEnv(host);                // 'prod' | 'sandbox'
+    const lab  = extractLabel(host);             // 'myc' | 'agn'
+    const colors = env === 'prod'
+      ? { bg: '#d32f2f', fg: '#ffffff', banner: 'red', tag: 'PROD' }
+      : { bg: '#1976d2', fg: '#ffffff', banner: 'blue', tag: 'SBX' };
+
+    // (1) Titel-Präfix als sichtbarer Proof-of-life
+    const prefix = '[' + colors.tag + ' ' + lab + '] ';
+    if (!document.title.startsWith(prefix)) document.title = prefix + document.title;
+
+    // (2) Favicon setzen
+    const href = pngDataUrl(lab, colors.bg, colors.fg);
+    setFavicon(href);
+
+    // (3) Banner wie in deinem Beispiel
+    addEnvBanner(env, colors.banner);
+
+    console.info('[sf-fav] applied', { env, lab, host });
+  }
+
+  // nach vollständigem Laden + ein paar Nachversuche (Lightning baut <head> oft später um)
+  function scheduleApplies() {
+    applyAll();
+    setTimeout(applyAll, 300);
+    setTimeout(applyAll, 1000);
+    setTimeout(applyAll, 2500);
+  }
+
+  if (document.readyState === 'complete') {
+    scheduleApplies();
+  } else {
+    // wie in deinem Script: nach load
+    window.addEventListener('load', scheduleApplies);
+  }
+
+  // Wenn Salesforce später wieder Icons setzt -> erneut anwenden
+  const mo = new MutationObserver(() => {
+    if (!$('link#tm-favicon[rel*="icon"]').length) applyAll();
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
 })();
