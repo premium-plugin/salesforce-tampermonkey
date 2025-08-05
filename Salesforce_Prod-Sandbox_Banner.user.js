@@ -75,15 +75,11 @@
       ? { bg: '#d32f2f', fg: '#ffffff', banner: 'red', tag: 'PROD' }
       : { bg: '#1976d2', fg: '#ffffff', banner: 'blue', tag: 'SBX' };
 
-    // (1) Titel-Präfix als sichtbarer Proof-of-life
-    const prefix = '[' + colors.tag + ' ' + lab + '] ';
-    if (!document.title.startsWith(prefix)) document.title = prefix + document.title;
-
-    // (2) Favicon setzen
+    // (1) Favicon setzen
     const href = pngDataUrl(lab, colors.bg, colors.fg);
     setFavicon(href);
 
-    // (3) Banner wie in deinem Beispiel
+    // (2) Banner wie in deinem Beispiel
     addEnvBanner(env, colors.banner);
 
     console.info('[sf-fav] applied', { env, lab, host });
