@@ -2,7 +2,7 @@
 // @name         Salesforce Prod/Sandbox Banner + Favicon (jQuery)
 // @namespace    https://example.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      1.0
+// @version      1.5
 // @description  Banner + Favicon (3 Buchstaben aus MyDomain) farbig nach Umgebung (PROD=Rot, Sandbox=Blau)
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
