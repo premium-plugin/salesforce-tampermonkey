@@ -2,7 +2,7 @@
 // @name         Salesforce Prod/Sandbox Banner + 2-Line Favicon (jQuery, normal weight, accent bottom)
 // @namespace    https://example.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version      0.1
+// @version      0.2
 // @description  Favicon zweizeilig (oben 3, unten 3) + unterer Balken (normal/setup/console). Schrift normal (400). Text 1px höher, Zeilenabstand +1px, zweite Zeile grün akzentuiert. Kein Title-Prefix. Banner bleibt.
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
