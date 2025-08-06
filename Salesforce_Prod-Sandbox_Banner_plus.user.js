@@ -11,12 +11,14 @@
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFmAKv1b7d+QAAAABJRU5ErkJggg==
 // @run-at       document-end
 // @grant        none
+// @noframes
 // ==/UserScript==
 
 (function () {
   'use strict';
-  if (window !== window.top) return; // nur Top-Tab
-  const $ = jQuery.noConflict(true);
+  if (window !== window.top) return;   // Top-Tab only (redundant, aber ok)
+  if (window.__sfFavInit__) return;    // Singleton-Guard
+  window.__sfFavInit__ = true;
 
   // ===== Anzeige-Config =====
   const CANVAS_SIZE       = 64; // wird sauber auf 16x16 skaliert
@@ -32,6 +34,7 @@
     setup:   '#000000', // schwarz
     console: '#00e5ff'  // cyan
   };
+  let __lastSig = '';
 
   // ===== Erkennung =====
   function isSetupPage() {
@@ -96,6 +99,12 @@
     if (isConsolePage()) return 'dev';
     if (p.includes('/lightning/setup/')) {
       const after = p.split('/lightning/setup/')[1] || '';
+      const parts = after.split('/');
+
+    // Neu: Setup → Object Manager → <ObjectApiName>/...
+    if ((parts[0] || '').toLowerCase() === 'objectmanager' && parts[1]) {
+      return obj3(parts[1]); // z.B. Account -> acc, Case -> cas, Custom__c -> cus
+    }
       const key   = (after.split('/')[0] || '').trim();
       return setup3(key);
     }
@@ -181,34 +190,37 @@
 
   // ===== Apply =====
   function applyAll() {
-    try {
-      const host  = location.hostname;
-      const env   = detectEnv(host);
-      const top3  = extractLabel(host);
-      const bot3  = context3();
-      const state = isConsolePage() ? 'console' : (isSetupPage() ? 'setup' : 'normal');
+  try {
+    const host  = location.hostname;
+    const env   = detectEnv(host);
+    const top3  = extractLabel(host);
+    const bot3  = context3();
+    const state = isConsolePage() ? 'console' : (isSetupPage() ? 'setup' : 'normal');
 
-      const colors = env === 'prod'
-        ? { bg: '#d32f2f', banner: 'red'  }  // PROD: Rot
-        : { bg: '#1976d2', banner: 'blue' }; // SBX : Blau
+    // NEU: Signatur – wenn identisch, kein weiterer Lauf
+    const sig = [host, env, top3, bot3, state].join('|');
+    if (sig === __lastSig) return;
+    __lastSig = sig;
 
-      const fgTop    = autoTextColor(colors.bg);
-      const barColor = BAR_COLORS[state] || BAR_COLORS.normal;
+    const colors = env === 'prod'
+      ? { bg: '#d32f2f', banner: 'red'  }
+      : { bg: '#1976d2', banner: 'blue' };
 
-      const href = pngTwoLineWithBar(top3, bot3, colors.bg, fgTop, barColor, BOTTOM_TEXT_ACCENT);
-      setFavicon(href);
-      addEnvBanner(env, colors.banner);
-    } catch (e) {
-      console.error('[sf-fav] ERROR', e);
-    }
+    const fgTop    = autoTextColor(colors.bg);
+    const barColor = BAR_COLORS[state] || BAR_COLORS.normal;
+
+    const href = pngTwoLineWithBar(top3, bot3, colors.bg, fgTop, barColor, BOTTOM_TEXT_ACCENT);
+    setFavicon(href);
+    addEnvBanner(env, colors.banner);
+  } catch (e) {
+    console.error('[sf-fav] ERROR', e);
   }
+}
 
   // ===== Hooks =====
   function scheduleApplies() {
     applyAll();
-    setTimeout(applyAll, 300);
-    setTimeout(applyAll, 1000);
-    setTimeout(applyAll, 2500);
+    //setTimeout(applyAll, 800);
   }
   if (document.readyState === 'complete') scheduleApplies();
   else window.addEventListener('load', scheduleApplies);
