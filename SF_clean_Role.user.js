@@ -1,13 +1,11 @@
 // ==UserScript==
 // @name         Make SF Role clean (without actions)
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Make SF Role clean (without actions)
 // @author       AAV
-// @match        *://*.my.salesforce-setup.com/lightning/setup/Roles*
-// @match        https://*.lightning.force.com/*
-// @match        https://*.my.salesforce-setup.com/*
-// @match        https://*.my.salesforce.com/*
+// @match        *://*.my.salesforce-setup.com/lightning/setup/Roles/home*
+// @match        *://*.my.salesforce-setup.com/ui/setup/user/RoleViewPage*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant        none
 // ==/UserScript==
