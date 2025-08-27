@@ -7,7 +7,6 @@
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
 // @match        *://*.salesforce-setup.com/*
-// @match        *://*.salesforce-experience.com/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFmAKv1b7d+QAAAABJRU5ErkJggg==
 // @run-at       document-end
 // @grant        none
