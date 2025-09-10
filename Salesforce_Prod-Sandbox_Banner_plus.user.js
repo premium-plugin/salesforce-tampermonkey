@@ -2,7 +2,7 @@
 // @name         Salesforce Favicon 2-Line — ULTRA LITE (delete-once, remember text, no loops)
 // @namespace    https://example.com
 // @version      0.3
-// @description  Löscht Favicons einmal pro URL, merkt bot3 einmalig (inkl. Flow='flo'), setzt eigenes Icon ohne Observer/Intervalle.
+// @description  Setzt eigenes Icon je Kunde und Page
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
 // @match        *://*.salesforce-setup.com/*
