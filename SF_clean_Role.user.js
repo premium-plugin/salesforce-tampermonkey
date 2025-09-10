@@ -2,9 +2,10 @@
 // @name         Make SF Role clean (without actions) — tiny
 // @namespace    http://tampermonkey.net/
 // @version      0.6
-// @description  Hide action UI on Salesforce Role pages (Lightning + Classic)
+// @description  Hide action UI on Salesforce Role pages
 // @author       AAV
 // @match        *://*.my.salesforce-setup.com/ui/setup/user/RoleViewPage*
+// @match        *://*.my.salesforce.com/ui/setup/user/RoleViewPage*
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
