@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Make SF Role clean (without actions) — tiny
+// @name         Make SF Role clean
 // @namespace    http://tampermonkey.net/
 // @version      0.6
 // @description  Hide action UI on Salesforce Role pages
