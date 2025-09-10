@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Salesforce Favicon 2-Line — ULTRA LITE (delete-once, remember text, no loops)
+// @name         Salesforce Banner + Favicon
 // @namespace    https://example.com
 // @version      0.3
 // @description  Salesforce Prod/Sandbox Banner + Icon
