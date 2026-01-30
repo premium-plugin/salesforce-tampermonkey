@@ -1,0 +1,184 @@
+// ==UserScript==
+// @name         NativeVideo - Download before Trim (direct download + safe fallback + tab message)
+// @namespace    http://tampermonkey.net/
+// @version      2026-01-26
+// @description  Adds "Download" before "Trim" inside NativeVideo menu (VF iframe). Tries direct download (fetch->blob). If blocked (CORS), navigates an already-opened tab. Shows a short "Downloading..." message in the blank tab.
+// @author       AAV
+// @match        *lightning.force.com/lightning/n/nativevideo__Vinton*
+// @match        *lightning.force.com/apex/nativevideo__VideoListLightningUniversal*
+// @match        *--nativevideo.vf.force.com/*
+// @grant        none
+// @run-at       document-start
+// ==/UserScript==
+
+(function () {
+  'use strict';
+
+  const isVF = location.host.includes('.vf.force.com');
+  if (!isVF) return;
+
+  // ---- URL detection ----
+  const PICK = (u) =>
+    typeof u === 'string' &&
+    u.includes('transcoded.mp4') &&
+    (u.includes('amazonaws.com') || u.includes('cloudfront.net'));
+
+  let lastUrl = null;
+
+  function setUrl(u) {
+    if (!u || u === lastUrl) return;
+    lastUrl = u;
+  }
+
+  // Perf observer
+  try {
+    const existing = performance.getEntriesByType('resource').map(e => e.name).filter(PICK);
+    if (existing.length) setUrl(existing.at(-1));
+
+    const po = new PerformanceObserver(list => {
+      for (const e of list.getEntries()) if (PICK(e.name)) setUrl(e.name);
+    });
+    po.observe({ type: 'resource', buffered: true });
+  } catch {}
+
+  // XHR hook (sometimes catches it earlier)
+  try {
+    const _open = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+      if (PICK(url)) setUrl(url);
+      return _open.call(this, method, url, ...rest);
+    };
+  } catch {}
+
+  function guessFilename(urlStr) {
+    try {
+      const u = new URL(urlStr);
+      const name = u.pathname.split('/').pop() || 'video.mp4';
+      return name.includes('.') ? name : 'video.mp4';
+    } catch {
+      return 'video.mp4';
+    }
+  }
+
+  async function directDownload(urlStr) {
+    // requires CORS; otherwise throws
+    const r = await fetch(urlStr, { mode: 'cors' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+
+    const blob = await r.blob();
+    const objUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = objUrl;
+    a.download = guessFilename(urlStr);
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(objUrl), 2000);
+  }
+
+  function showWorkingMessage(w) {
+    if (!w) return;
+    try {
+      w.document.open();
+      w.document.write(`
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Downloading…</title>
+            <style>
+              body{font:14px system-ui;margin:24px}
+              .box{max-width:520px}
+              .muted{opacity:.7}
+            </style>
+          </head>
+          <body>
+            <div class="box">
+              <h3>Download läuft…</h3>
+              <div class="muted">Bitte Tab nicht schließen.</div>
+            </div>
+          </body>
+        </html>
+      `);
+      w.document.close();
+    } catch {}
+  }
+
+  function inject() {
+    const menus = document.querySelectorAll('.nv-trimmer-menu-popup');
+    if (!menus.length) return;
+
+    menus.forEach(menu => {
+      if (menu.querySelector('.nv-tm-download')) return;
+
+      const items = [...menu.querySelectorAll('button.nv-trimmer-menu-item')];
+      const trimBtn = items.find(b => (b.textContent || '').trim().toLowerCase() === 'trim');
+
+      const dl = document.createElement('button');
+      dl.type = 'button';
+      dl.className = 'nv-trimmer-menu-item nv-tm-download';
+      dl.textContent = 'Download';
+
+      function markBroken() {
+        dl.textContent = 'Download (broken)';
+        dl.style.opacity = '0.75';
+        try { console.warn('[NV-DL] not ok'); } catch {}
+      }
+
+      dl.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!lastUrl) {
+          markBroken();
+          return;
+        }
+
+        const oldText = dl.textContent;
+        dl.textContent = 'Download…';
+
+        // Open a blank tab immediately (user gesture) so fallback won't be blocked
+        let w = null;
+        try {
+          w = window.open('about:blank', '_blank'); // no noopener => we can write + later set location
+          if (w) {
+            // optional: detach opener a bit (may fail depending on browser)
+            try { w.opener = null; } catch {}
+            showWorkingMessage(w);
+          }
+        } catch {}
+
+        try {
+          await directDownload(lastUrl);
+          try { console.log('[NV-DL] ok'); } catch {}
+
+          // close the blank tab if it exists
+          try { if (w && !w.closed) w.close(); } catch {}
+        } catch {
+          // CORS blocked or fetch failed => use already opened tab
+          try { console.warn('[NV-DL] not ok'); } catch {}
+          try {
+            if (w && !w.closed) w.location.href = lastUrl;
+            else window.open(lastUrl, '_blank');
+          } catch {
+            window.open(lastUrl, '_blank');
+          }
+        } finally {
+          dl.textContent = oldText;
+        }
+      }, true);
+
+      if (trimBtn) menu.insertBefore(dl, trimBtn);
+      else menu.insertBefore(dl, menu.firstChild);
+
+      if (!lastUrl) markBroken();
+    });
+  }
+
+  const mo = new MutationObserver(inject);
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+  window.addEventListener('load', inject);
+})();
