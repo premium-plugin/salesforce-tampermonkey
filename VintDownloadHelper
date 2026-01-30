@@ -4,9 +4,9 @@
 // @version      2026-01-26
 // @description  Adds "Download" before "Trim" inside NativeVideo menu (VF iframe). Tries direct download (fetch->blob). If blocked (CORS), navigates an already-opened tab. Shows a short "Downloading..." message in the blank tab.
 // @author       AAV
-// @match        *lightning.force.com/lightning/n/nativevideo__Vinton*
-// @match        *lightning.force.com/apex/nativevideo__VideoListLightningUniversal*
-// @match        *--nativevideo.vf.force.com/*
+// @match        *://*.lightning.force.com/lightning/n/nativevideo__Vinton*
+// @match        *://*.lightning.force.com/apex/nativevideo__VideoListLightningUniversal*
+// @match        *://*.--nativevideo.vf.force.com/*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
