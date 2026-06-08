@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Salesforce Favicon + Env Marker — ULTRA LITE MAPPED
 // @namespace    https://example.com
-// @version      0.4
+// @version      0.5
 // @description  Salesforce Prod/Sandbox Favicon + Thin Top Line + Org Badge with mapping
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
@@ -280,7 +280,7 @@
       #tm-sf-env-marker-badge {
         position: fixed;
         top: 11px;
-        right: 270px;
+        right: 300px;
         max-width: calc(100vw - 130px);
         overflow: hidden;
         text-overflow: ellipsis;
