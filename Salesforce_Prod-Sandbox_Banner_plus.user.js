@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Salesforce Favicon + Env Marker — ULTRA LITE MAPPED
 // @namespace    https://example.com
-// @version      0.5.1
+// @version      0.6.1
 // @description  Salesforce Prod/Sandbox Favicon + Thin Top Line + Org Badge with mapping
 // @match        *://*.lightning.force.com/*
 // @match        *://*.my.salesforce.com/*
